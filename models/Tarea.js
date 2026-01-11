@@ -1,6 +1,11 @@
 import { Schema, model } from 'mongoose';
 
 const TareaSchema = Schema({
+    id: { 
+        type: Number, 
+        unique: true, 
+        required: true 
+    },
     descripcion: {
         type: String,
         required: [true, 'La descripción es obligatoria']

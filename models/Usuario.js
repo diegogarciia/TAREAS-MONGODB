@@ -1,6 +1,11 @@
 import { Schema, model } from 'mongoose';
 
 const UsuarioSchema = Schema({
+    id: { 
+        type: Number, 
+        unique: true, 
+        required: true 
+    },
     nombre: {
         type: String,
         required: [true, 'El nombre es obligatorio']
@@ -20,10 +25,6 @@ const UsuarioSchema = Schema({
         default: 'ESTANDAR',
         enum: ['ADMINISTRADOR', 'ESTANDAR'] 
     },
-    operativo: {
-        type: Boolean,
-        default: true 
-    }
 }, { 
     versionKey: false 
 });
