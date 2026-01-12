@@ -26,7 +26,7 @@ const UsuarioSchema = Schema({
         enum: ['ADMINISTRADOR', 'ESTANDAR'] 
     },
 }, { 
-    versionKey: false 
+    collection: 'usuarios', versionKey: false, strict: false
 });
 
 export default model('Usuario', UsuarioSchema);

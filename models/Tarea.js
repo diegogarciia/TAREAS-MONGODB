@@ -6,6 +6,11 @@ const TareaSchema = Schema({
         unique: true, 
         required: true 
     },
+    idUsuarioAsignado: {
+        type: Number, 
+        unique: true, 
+        required: true
+    },
     descripcion: {
         type: String,
         required: [true, 'La descripción es obligatoria']
@@ -24,10 +29,13 @@ const TareaSchema = Schema({
         default: 'Todo',
         enum: ['Todo', 'In progress', 'Done'] 
     },
-    asignadaA: {
+    /*asignadaA: {
         type: Schema.Types.ObjectId,
         ref: 'Usuario' 
     }
+    */
+}, {
+    collection: 'comentarios' , versionKey: false, strict: false
 });
 
 export default model('Tarea', TareaSchema);
