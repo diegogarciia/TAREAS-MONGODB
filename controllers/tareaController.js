@@ -137,7 +137,42 @@ const controlador = {
             console.error('❌ Error al obtener tareas por usuario:', error);
             res.status(500).json({ 'msg': 'Error al obtener tareas' });
         }     
+    },
+    tareasPut : async (req, res) => {
+        const { idUsuarioAsignado, descripcion, duracion, dificultad, estado } = req.body;
+
+        try {
+            //const usuarioActualizado = await UserModel.updateOne({id : req.params.id}, { nombre, edad, tfno });
+            const tareaActualizada = await TareaModel.findOneAndUpdate({id : req.params.id}, req.body, { new: true }); //{ new: true }   <-- Devuelve el documento actualizado
+            if (tareaActualizada) {
+                console.log('🔵 Tarea actualizada correctamente!');
+                res.status(200).json(tareaActualizada);
+            } else {
+                console.log('‼️ Tarea no encontrada!');
+                res.status(404).json({ 'msg': 'Tarea no encontrada' });
+            }
+        } catch (error) {
+            console.error('❌ Error al actualizar tarea:', error);
+            res.status(500).json({ 'msg': 'Error al actualizar tarea' });
+        }
+    },
+    tareasDelete : async (req, res) => {
+
+        try {
+            const tareaEliminada = await TareaModel.deleteOne({id:req.params.id});
+            if (tareaEliminada.deletedCount > 0) {
+                console.log('🔵 Tarea eliminada correctamente!');
+                res.status(200).json(tareaEliminada);
+            } else {
+                console.log('‼️ Tarea no encontrada!');
+                res.status(404).json({ 'msg': 'Tarea no encontrada' });
+            }
+        } catch (error) {
+            console.error('❌ Error al eliminar tarea:', error);
+            res.status(500).json({ 'msg': 'Error al eliminar tarea' });
+        }
     }
+    
 }
 
 export default controlador;  //Exportamos el controlador para poder usarlo en las rutas.

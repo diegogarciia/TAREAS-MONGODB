@@ -5,6 +5,8 @@ dotenv.config();
 import kleur from 'kleur';
 import mongoose from "mongoose";
 mongoose.set('strictQuery', false);
+import {router as userRoutes} from '../routes/userRoutes.js';
+import {router as tareaRoutes} from '../routes/tareaRoutes.js';
 
 class Server {
     
@@ -36,7 +38,8 @@ class Server {
     }
 
     routes() {
-
+        this.app.use(this.authPath, userRoutes);
+        this.app.use(this.tasksPath, tareaRoutes);
     }
 
     listen() {

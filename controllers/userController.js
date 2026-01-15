@@ -12,7 +12,7 @@ const controlador = {
                 usuariosNuevos.push({
                     nombre: faker.person.fullName(),
                     email: faker.internet.email(),
-                    password: '123', 
+                    password: faker.internet.password(), 
                     rol: 'ESTANDAR',
                 });
             }
@@ -26,7 +26,6 @@ const controlador = {
             res.status(500).json({ msg: 'Error al generar usuarios masivos' });
         }
     },
-
     usuariosGet : async (req, res) => {
         try {
             const personas = await UserModel.find().lean();
