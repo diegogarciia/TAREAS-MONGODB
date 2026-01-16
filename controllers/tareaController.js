@@ -156,6 +156,27 @@ const controlador = {
             res.status(500).json({ 'msg': 'Error al actualizar tarea' });
         }
     },
+    tareaActualizarEstado: async (req, res) => {
+        try {
+            const { estado } = req.body;
+
+            const filtro = { 
+                id: req.params.id, 
+                asignadaA: req.usuario._id 
+            };
+
+            const tareaActualizada = await TareaModel.findOneAndUpdate(
+                filtro, 
+                { estado }, 
+                { new: true, runValidators: true }
+            );
+
+            if (!tareaActualizada) return res.status(403).json({ msg: "No autorizado o tarea no encontrada" });
+            res.status(200).json(tareaActualizada);
+        } catch (error) {
+            res.status(500).json({ msg: "Error al actualizar estado" });
+        }
+    },
     tareasDelete : async (req, res) => {
 
         try {
