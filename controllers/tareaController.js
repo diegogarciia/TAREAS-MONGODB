@@ -5,14 +5,15 @@ const controlador = {
 
     addTarea: async (req, res) => {
         try {
-            //const userId = parseInt(req.params.id); //Convertimos el id de la URL a número.
-            const { idUsuarioAsignado, descripcion } = req.body; //Extraemos el comentario y el idU del cuerpo de la petición.
+            const { idUsuarioAsignado, descripcion, duracion, dificultad, estado } = req.body; 
 
-            if (!descripcion || descripcion.trim() === "") { //Aunque esta validación sería mejor con express-validator.
+            const ultimaTarea = await TareaModel.findOne().sort('-id');
+            const nuevoId = ultimaTarea ? ultimaTarea.id + 1 : 1;
+
+            if (!descripcion || descripcion.trim() === "") { 
                 return res.status(400).json({ msg: "La descripción no puede estar vacía" });
             }
 
-            //Verificamos si el usuario existe
             const usuario = await UserModel.findOne({ id: idUsuarioAsignado });
 
             if (!usuario) {
@@ -20,16 +21,15 @@ const controlador = {
                 return res.status(404).json({ msg: "Usuario no encontrado" });
             }
 
-            //Si el usuario existe creamos el nuevo comentario
             const nuevaTarea = new TareaModel({
+                id: nuevoId,
                 idUsuarioAsignado: idUsuarioAsignado,
                 descripcion: descripcion, 
-                duracion: 0, 
-                dificultad: "0", 
-                estado: "0", 
+                duracion: duracion, 
+                dificultad: dificultad, 
+                estado: estado, 
             });
 
-            //Finalmente Guardamos en la base de datos.
             await nuevaTarea.save();
 
             console.log("🔵 Tarea añadida correctamente:", nuevaTarea);
@@ -60,7 +60,7 @@ const controlador = {
         try {
             const tareasPorUsuario = await TareaModel.aggregate([
                 {
-                    $lookup: { //Unimos la colección 'usuarios' a 'comments'  por los campos indicados.
+                    $lookup: { 
                         from: 'usuarios',  
                         localField: 'idUsuarioAsignado',
                         foreignField: 'id',
@@ -68,13 +68,13 @@ const controlador = {
                     }
                 },
                 {
-                    $unwind: '$usuario'  //Como usuario es un array después del $lookup, usamos $unwind para convertirlo en un objeto normal.
+                    $unwind: '$usuario'  
                 },
                 {
-                    $group: { //Agrupamos los comentarios usando _id: '$usuario.nombre', es decir, cada grupo tendrá el nombre del usuario.
+                    $group: { 
                         _id: '$usuario.nombre',
                         tareas: {
-                            $push: { //$push agrega cada comentario dentro del array comentarios.
+                            $push: {
                                 tareaId: '$_id',
                                 descripcion: '$descripcion',
                                 duracion: '$duracion',
@@ -96,7 +96,7 @@ const controlador = {
     },
     tareaGetAsignadaA : async (req, res) => {
         try {
-            const userId = parseInt(req.params.id);  //Esto es necesario porque al usar $match se pone un poco tiquismiquis con los tipos y req.params.id no es int (que es como está definido).
+            const userId = parseInt(req.params.id);  
             const tareasPorUsuario = await TareaModel.aggregate([
                 {
                     $match: { //Filtramos por esa id.
@@ -104,7 +104,7 @@ const controlador = {
                     }
                 },
                 {
-                    $lookup: { //Unimos la colección 'usuarios' a 'comments'  por los campos indicados.
+                    $lookup: { 
                         from: 'usuarios',  
                         localField: 'idUsuarioAsignado',
                         foreignField: 'id',
@@ -112,13 +112,13 @@ const controlador = {
                     }
                 },
                 {
-                    $unwind: '$usuario' //Como usuario es un array después del $lookup, usamos $unwind para convertirlo en un objeto normal.
+                    $unwind: '$usuario' 
                 },
                 {
-                    $group: { //Agrupamos los comentarios usando _id: '$usuario.nombre', es decir, cada grupo tendrá el nombre del usuario.
+                    $group: { 
                         _id: '$usuario.nombre',
                         tareas: {
-                            $push: { //$push agrega cada comentario dentro del array comentarios.
+                            $push: { 
                                 tareaId: '$_id',
                                 descripcion: '$descripcion',
                                 duracion: '$duracion',
@@ -142,8 +142,7 @@ const controlador = {
         const { idUsuarioAsignado, descripcion, duracion, dificultad, estado } = req.body;
 
         try {
-            //const usuarioActualizado = await UserModel.updateOne({id : req.params.id}, { nombre, edad, tfno });
-            const tareaActualizada = await TareaModel.findOneAndUpdate({id : req.params.id}, req.body, { new: true }); //{ new: true }   <-- Devuelve el documento actualizado
+            const tareaActualizada = await TareaModel.findOneAndUpdate({id : req.params.id}, req.body, { new: true }); 
             if (tareaActualizada) {
                 console.log('🔵 Tarea actualizada correctamente!');
                 res.status(200).json(tareaActualizada);
@@ -196,4 +195,4 @@ const controlador = {
     
 }
 
-export default controlador;  //Exportamos el controlador para poder usarlo en las rutas.
+export default controlador; 

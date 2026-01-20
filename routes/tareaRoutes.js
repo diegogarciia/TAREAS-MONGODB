@@ -5,13 +5,12 @@ import {validarJWT} from "../middlewares/validarJWT.js";
 
 export const router = Router();
 
-//El segundo parámetro (optativo) son los middlewares.
 router.get('/', validarJWT, controlador.tareasGet);
 router.get('/asignadas', validarJWT, controlador.tareasGetAsignadas);
 router.get('/asignadas/:id', validarJWT, controlador.tareaGetAsignadaA);
 
 router.put('/estado/:id', validarJWT, controlador.tareaActualizarEstado);
 
-router.post('/', [esAdmin], validarJWT, controlador.addTarea);
-router.put('/:id', [esAdmin], validarJWT, controlador.tareasPut);
-router.delete('/:id', [esAdmin], validarJWT, controlador.tareasDelete);
+router.post('/', [validarJWT, esAdmin], controlador.addTarea);
+router.put('/:id', [validarJWT, esAdmin], controlador.tareasPut);
+router.delete('/:id', [validarJWT, esAdmin], controlador.tareasDelete);

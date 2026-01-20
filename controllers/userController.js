@@ -10,6 +10,7 @@ const controlador = {
         try {
             for (let i = 0; i < cantidad; i++) {
                 usuariosNuevos.push({
+                    id: Math.floor(Math.random() * 1000000),
                     nombre: faker.person.fullName(),
                     email: faker.internet.email(),
                     password: faker.internet.password(), 
@@ -29,7 +30,6 @@ const controlador = {
     usuariosGet : async (req, res) => {
         try {
             const personas = await UserModel.find().lean();
-            //const personas = await UserModel.find();  //Sin .lean() devuelve documentos de Mongoose, con .lean() devuelve objetos JS puros. Al ser datos más ligeros, mejora el rendimiento en lecturas ya que no se necesitan las funcionalidades de JSON.stringify que son llamadas automáticamente al enviar la respuesta.
             
             if (personas.length > 0) {
                 console.log(personas)
@@ -64,24 +64,17 @@ const controlador = {
         const { id, nombre, email, password } = req.body;
 
         try {
-            //En lugar de body podemos usar los campos, para un mayor control y coherencia. También podremos combinar con validator y middlewares.
-            // UserModel.create({ id, nombre, edad, tfno }  , (err, usuario) => {
             const usuario = await UserModel.create({
                 id,
                 nombre,
                 email,
                 password,
-                rol: 'ESTANDAR' 
+                rol 
             });
 
             console.log('🔵 Usuario registrado correctamente!');
             res.status(201).json(usuario);
 
-            //O también...
-            //const nuevoUsuario = new UserModel({ id, nombre, edad, tfno });
-            //await nuevoUsuario.save();
-            //console.log('Usuario registrado correctamente!');
-            //res.status(201).json(nuevoUsuario);
         } catch (error) {
             console.error('❌ Error al registrar usuario:', error);
             res.status(500).json({ 'msg': 'Error al registrar usuario' });
@@ -91,8 +84,7 @@ const controlador = {
         const { nombre, email, password } = req.body;
 
         try {
-            //const usuarioActualizado = await UserModel.updateOne({id : req.params.id}, { nombre, edad, tfno });
-            const usuarioActualizado = await UserModel.findOneAndUpdate({id : req.params.id}, req.body, { new: true }); //{ new: true }   <-- Devuelve el documento actualizado
+            const usuarioActualizado = await UserModel.findOneAndUpdate({id : req.params.id}, req.body, { new: true }); 
             if (usuarioActualizado) {
                 console.log('🔵 Usuario actualizado correctamente!');
                 res.status(200).json(usuarioActualizado);
@@ -109,8 +101,7 @@ const controlador = {
         const { rol } = req.body;
 
         try {
-            //const usuarioActualizado = await UserModel.updateOne({id : req.params.id}, { nombre, edad, tfno });
-            const usuarioActualizado = await UserModel.findOneAndUpdate({id : req.params.id}, req.body, { new: true }); //{ new: true }   <-- Devuelve el documento actualizado
+            const usuarioActualizado = await UserModel.findOneAndUpdate({id : req.params.id}, req.body, { new: true }); 
             if (usuarioActualizado) {
                 console.log('🔵 Usuario actualizado correctamente!');
                 res.status(200).json(usuarioActualizado);
@@ -141,4 +132,4 @@ const controlador = {
     }
 }
 
-export default controlador;  //Exportamos el controlador para poder usarlo en las rutas.
+export default controlador;  

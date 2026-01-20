@@ -1,23 +1,26 @@
-import jwt  from 'jsonwebtoken'
-import {response, request} from 'express'  //Incorporamos esto aquí porque vamos a añadir elementos a req que sacaremos del token.
+import jwt from 'jsonwebtoken';
+import {response, request} from 'express' 
 
-export const validarJWT = (req , res , next) => {  //Estas asignaciones son necesarias para almacenar en el request los datos que extraigamos del token.
-    const token = req.header('x-token');  //Este nombre será establecido en el cliente también.
+export const validarJWT = (req , res , next) => { 
+    const token = req.header('x-token') 
+    
 
     if (!token){
-        return res.status(401).json({'msg':'No hay token en la petición.'});
+        return res.status(401).json({'msg':'No hay token en la petición.'})
     }
 
     try {
         
-        const {uid} = jwt.verify(token, process.env.SECRETORPRIVATEKEY);
-        req.dniToken = uid;
-        console.log(uid);
-        console.log(token);
-        next();
+        const {uid, roles} = jwt.verify(token, process.env.SECRETORPRIVATEKEY)
+        req.uid = uid
+        req.roles = roles
+        console.log(uid)
+        console.log(roles)
+        console.log(token)
+        next()
         
     }catch(error){
         console.log(error);
-        res.status(401).json({'msg':'Token no válido.'});
+        res.status(401).json({'msg':'Token no válido.'})
     }
 }
