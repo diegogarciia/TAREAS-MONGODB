@@ -23,6 +23,7 @@ const typeDefs = gql`
     usuario(id: Int!): Usuario
     tareas: [Tarea]
     tarea(id: Int!): Tarea
+    tareasPorUsuario(userId: Int!): [Tarea]
   }
 
   type Mutation {    

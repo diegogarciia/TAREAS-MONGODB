@@ -8,6 +8,10 @@ mongoose.set('strictQuery', false);
 import {router as userRoutes} from '../routes/userRoutes.js';
 import {router as tareaRoutes} from '../routes/tareaRoutes.js';
 import {router as authRoutes} from '../routes/authRoutes.js';
+import { expressMiddleware } from '@as-integrations/express4';
+import typeDefs from '../typeDefs/typeDefs.js';
+import resolvers from '../resolvers/resolvers.js';
+import { ApolloServer } from '@apollo/server';
 
 class Server {
     
@@ -15,11 +19,38 @@ class Server {
         this.app = express();
         
         this.tasksPath = '/tasks'; 
-        this.authPath  = '/auth';  
+        this.authPath  = '/auth';
+        this.graphQLPath = '/graphql';  
 
         this.middlewares();
         this.conectarMongoose();
         this.routes();
+
+        this.serverGraphQL = new ApolloServer({
+            typeDefs,
+            resolvers,
+            plugins: [
+                {
+                    async requestDidStart() {
+                        return {
+                            async willSendResponse({ response, errors }) {
+                                if (errors) {
+                                    response.body.singleResult.errors = errors.map(err => ({
+                                        message: err.message
+                                    }));
+                                }
+                            },
+                        };
+                    },
+                },
+            ],
+        });
+    }
+
+    async start() {
+        await this.serverGraphQL.start();
+        this.applyGraphQLMiddleware();
+        this.listen();
     }
 
     async conectarMongoose() {
@@ -36,6 +67,7 @@ class Server {
     middlewares() {
         this.app.use(cors());
         this.app.use(express.json());
+        this.app.use(express.static('public'));
     }
 
     routes() {
@@ -43,10 +75,17 @@ class Server {
         this.app.use(this.tasksPath, tareaRoutes);
     }
 
+    applyGraphQLMiddleware() {
+        this.app.use(this.graphQLPath , express.json(), expressMiddleware(this.serverGraphQL));
+    }
+
     listen() {
         this.app.listen(process.env.PORT, () => {
-            console.log(kleur.green().bold(`🟢 Servidor corriendo en puerto: ${process.env.PORT}`));
-        });
+            console.log(kleur.green(`🟢 Servidor GraphQL escuchando en: ${process.env.URL}:${process.env.PORT}${this.graphQLPath}`));
+            console.log(kleur.blue(`🔵 Servidor API Rest escuchando en: ${process.env.URL}:${process.env.PORT}${this.usuariosPath}`));
+            console.log(kleur.yellow(`🌎 Página de prueba escuchando en: ${process.env.URL}:${process.env.PORT}`));
+        })
+        this.applyGraphQLMiddleware()
     }
 }
 
