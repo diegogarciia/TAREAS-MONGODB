@@ -53,6 +53,15 @@ const typeDefs = gql`
 
     tareaActualizarEstado(id: Int!, estado: String!): Tarea
   }
+
+  type Autenticacion {
+  token: String!
+  usuario: Usuario!
+  }
+  
+  extend type Mutation {
+  login(email: String!, password: String!): Autenticacion
+  }
 `;
 
 export default typeDefs

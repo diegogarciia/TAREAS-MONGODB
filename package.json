@@ -18,21 +18,23 @@
     "url": "https://github.com/diegogarciia/TAREAS-MONGODB/issues"
   },
   "dependencies": {
+    "@apollo/server": "^5.2.0",
+    "@as-integrations/express4": "^1.1.2",
     "@faker-js/faker": "^10.2.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^4.22.1",
     "google-auth-library": "^10.5.0",
+    "graphql": "^16.12.0",
+    "graphql-tag": "^2.12.6",
     "jsonwebtoken": "^9.0.3",
     "kleur": "^4.1.5",
     "mongodb": "^7.0.0",
     "mongoose": "^9.1.1",
     "nodemon": "^3.1.11",
-    "graphql": "^16.12.0",
-    "graphql-tag": "^2.12.6",
-    "uuid": "^13.0.0",
-    "@apollo/server": "^5.2.0",
-    "@as-integrations/express4": "^1.1.2"
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"

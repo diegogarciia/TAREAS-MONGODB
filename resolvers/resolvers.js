@@ -1,6 +1,7 @@
 import UserModel from '../models/Usuario.js';
 import TareaModel from '../models/Tarea.js';
 import { faker } from '@faker-js/faker';
+import jwt from 'jsonwebtoken';
 
 const resolvers = {
     Query: {
@@ -79,6 +80,24 @@ const resolvers = {
                 { estado },
                 { new: true }
             );
+        },
+        
+        login: async (_, { email, password }) => {
+            const usuario = await UserModel.findOne({ email });
+            if (!usuario) throw new Error('Usuario no encontrado');
+            
+            const esValida = (password === usuario.password); 
+            if (!esValida) throw new Error('Contraseña incorrecta');
+
+            const SECRET_KEY = process.env.SECRETORPRIVATEKEY
+
+            const token = jwt.sign(
+                { id: usuario.id, email: usuario.email },
+                SECRET_KEY,
+                { expiresIn: '24h' }
+            );
+            
+            return { token, usuario };
         }
     },
 

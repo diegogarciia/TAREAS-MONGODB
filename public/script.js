@@ -155,3 +155,14 @@ const obtenerCargaTrabajo = async () => {
         mostrarResultado(data);
     }
 };
+
+const token = localStorage.getItem('token');
+
+if (!token) {
+    window.location.href = 'login.html';
+}
+
+const nombreUsuario = localStorage.getItem('user_name');
+if (nombreUsuario) {
+    console.log(`Bienvenido, ${nombreUsuario}`);
+}
