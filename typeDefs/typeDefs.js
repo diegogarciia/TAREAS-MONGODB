@@ -16,6 +16,7 @@ const typeDefs = gql`
     duracion: Int!
     dificultad: String!
     estado: String
+    usuario: Usuario
   }
 
   type Query {

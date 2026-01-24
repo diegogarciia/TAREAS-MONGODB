@@ -76,6 +76,16 @@ const resolvers = {
                 { new: true }
             );
         }
+    },
+
+    Tarea: {
+        usuario: async (parent) => {
+            try {
+                return await UserModel.findOne({ id: parent.idUsuarioAsignado });
+            } catch (error) {
+                throw new Error("No se pudo cargar el usuario de esta tarea.");
+            }
+        }
     }
 };
 
