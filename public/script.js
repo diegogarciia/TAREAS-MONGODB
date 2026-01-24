@@ -166,3 +166,10 @@ const nombreUsuario = localStorage.getItem('user_name');
 if (nombreUsuario) {
     console.log(`Bienvenido, ${nombreUsuario}`);
 }
+
+document.getElementById('btnLogout').addEventListener('click', () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user_name');
+
+    window.location.href = 'login.html';
+});
