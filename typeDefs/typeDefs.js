@@ -7,6 +7,7 @@ const typeDefs = gql`
     nombre: String!
     email: String!
     rol: String!
+    tareas: [Tarea]
   }
 
   type Tarea {

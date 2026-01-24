@@ -86,6 +86,16 @@ const resolvers = {
                 throw new Error("No se pudo cargar el usuario de esta tarea.");
             }
         }
+    },
+
+    Usuario: {
+        tareas: async (parent) => {
+            try {
+                return await TareaModel.find({ idUsuarioAsignado: parent.id });
+            } catch (error) {
+                throw new Error("No se pudieron cargar las tareas de este usuario.");
+            }
+        }
     }
 };
 
