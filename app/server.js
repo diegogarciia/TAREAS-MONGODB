@@ -12,6 +12,7 @@ import { expressMiddleware } from '@as-integrations/express4';
 import typeDefs from '../typeDefs/typeDefs.js';
 import resolvers from '../resolvers/resolvers.js';
 import { ApolloServer } from '@apollo/server';
+import { router as googleRoutes} from '../routes/googleRoutes.js';
 
 class Server {
     
@@ -73,6 +74,7 @@ class Server {
     routes() {
         this.app.use(this.authPath, userRoutes, authRoutes);
         this.app.use(this.tasksPath, tareaRoutes);
+        this.app.use('/api/auth', googleRoutes);
     }
 
     applyGraphQLMiddleware() {
