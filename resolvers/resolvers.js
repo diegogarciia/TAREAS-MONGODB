@@ -19,6 +19,10 @@ const resolvers = {
         },
         tareasPorUsuario: async (_, { userId }) => {
             return await TareaModel.find({ idUsuarioAsignado: userId });
+        },
+        tareas: async (_, { dificultad }) => {
+            const filtro = dificultad ? { dificultad } : {};
+            return await TareaModel.find(filtro);
         }
     },
 

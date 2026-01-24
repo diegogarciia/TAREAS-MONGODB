@@ -61,7 +61,7 @@ const controlador = {
         }
     },
     usuariosPost : async (req, res) => {
-        const { id, nombre, email, password } = req.body;
+        const { id, nombre, email, password, rol } = req.body;
 
         try {
             const usuario = await UserModel.create({

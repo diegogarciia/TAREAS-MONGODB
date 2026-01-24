@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Tareas GraphQL</title>
+    </head>
+<body>
+
+    <header>
+        <h1>Panel de Gestión de Tareas</h1>
+    </header>
+
+    <main>
+        <section id="controles">
+            <h2>Consultas y Filtros</h2>
+            
+            <div class="grupo-control">
+                <h3>Dificultad y Complejidad</h3>
+                <button onclick="obtenerTareasDificultad()">Tareas por Complejidad</button>
+                <button onclick="obtenerTareasRango()">Rango (Menor → Mayor)</button>
+                <button onclick="contarTareasMaximas()">Total Máxima Dificultad (XL)</button>
+            </div>
+
+            <div class="grupo-control">
+                <h3>Asignaciones</h3>
+                <button onclick="obtenerTareasPorPersona()">Tareas por Persona</button>
+                <button onclick="obtenerTareasPersonaFiltradas()">Persona + Dificultad</button>
+                <button onclick="obtenerTareasSinAsignar()">Tareas sin Asignar (Prioridad)</button>
+            </div>
+
+            <div class="grupo-control">
+                <h3>Extras</h3>
+                <button onclick="obtenerCargaTrabajo()">Carga de Trabajo por Usuario</button>
+            </div>
+        </section>
+
+        <section id="seccion-resultados">
+            <h2>Resultados de la Consulta</h2>
+            <div id="resultado" class="json-viewer">
+                <p>Esperando consulta...</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="./script.js"></script>
+
+    </body>
+</html>

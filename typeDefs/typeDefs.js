@@ -23,7 +23,7 @@ const typeDefs = gql`
   type Query {
     usuarios: [Usuario]
     usuario(id: Int!): Usuario
-    tareas: [Tarea]
+    tareas(dificultad: String): [Tarea]
     tarea(id: Int!): Tarea
     tareasPorUsuario(userId: Int!): [Tarea]
   }
