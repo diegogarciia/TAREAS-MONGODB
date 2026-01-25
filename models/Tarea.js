@@ -34,7 +34,7 @@ const TareaSchema = Schema({
     }
     */
 }, {
-    collection: 'comentarios' , versionKey: false, strict: false
+    collection: 'tareas' , versionKey: false, strict: false
 });
 
 export default model('Tarea', TareaSchema);
