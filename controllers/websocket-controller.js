@@ -9,6 +9,6 @@ export const socketController = (socket, io) => {
     });
 
     socket.on("disconnect", () => {
-        console.log(kleur.gray("Monitor desconectado"), socket.id);
+        console.log(kleur.gray("Cliente desconectado"), socket.id);
     });
 };

@@ -4,19 +4,19 @@ import { generarJWT_Roles, generarJWT } from '../helpers/generate_jwt.js';
 import { googleVerify } from '../helpers/google-verify.js';
 
 export const login = async (req, res = response) => {
-    const { id, nombre } = req.body;  
+    const { email, password } = req.body;  
 
     try {
-        const usuario = await UserModel.findOne({ id, nombre });  
+        const usuario = await UserModel.findOne({ email, password });  
 
         if (!usuario) {
             console.log('Usuario no encontrado.');
-            return res.status(400).json({ msg: 'Usuario o nombre incorrecto.' });
+            return res.status(400).json({ msg: 'Usuario o email incorrecto.' });
         }
 
-        const token = generarJWT_Roles(usuario.id, [usuario.rol]); 
+        const token = generarJWT_Roles(usuario.id, [usuario.email]); 
 
-        console.log('Usuario correcto! ' + usuario.nombre);
+        console.log('Usuario correcto! ' + usuario.email);
         res.status(200).json({ usuario, token });
 
     } catch (error) {
