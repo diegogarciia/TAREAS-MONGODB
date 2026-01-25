@@ -63,7 +63,7 @@ const resolvers = {
                 descripcion,
                 duracion,
                 dificultad,
-                estado: estado || 'Todo'
+                estado: estado || 'por hacer'
             });
 
             const resultado = await nuevaTarea.save();
