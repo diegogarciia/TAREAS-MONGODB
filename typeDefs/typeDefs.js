@@ -52,6 +52,8 @@ const typeDefs = gql`
     tareasDelete(id: Int!): Boolean
 
     tareaActualizarEstado(id: Int!, estado: String!): Tarea
+
+    asignarTarea(id: Int!, idUsuarioAsignado: Int!): Tarea
   }
 
   type Autenticacion {

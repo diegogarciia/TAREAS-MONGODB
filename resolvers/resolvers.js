@@ -102,7 +102,22 @@ const resolvers = {
             );
             
             return { token, usuario };
+        },
+
+        asignarTarea: async (_, { id, idUsuarioAsignado }, { io }) => {
+            const tareaActualizada = await TareaModel.findOneAndUpdate(
+                { id: id },
+                { idUsuarioAsignado: idUsuarioAsignado },
+                { new: true } 
+            );
+            
+            if (tareaActualizada && io) {
+                io.emit('actualizar-dashboard');
+            }
+            
+            return tareaActualizada;
         }
+
     },
 
     Tarea: {

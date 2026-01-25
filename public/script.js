@@ -268,3 +268,23 @@ const mostrarFormularioTarea = async () => {
     mostrarResultado(data);
 
 };
+
+const asignarTareaUsuario = async () => {
+    const id = parseInt(prompt("Introduce el ID de la tarea:"));
+    const idUsuarioAsignado = parseInt(prompt("Introduce el ID del usuario al que quieres asignarla:"));
+
+    if (isNaN(id) || isNaN(idUsuarioAsignado)) return alert("IDs no válidos");
+
+    const query = `
+        mutation Asignar($idT: Int!, $idU: Int!) {
+            asignarTarea(id: $idT, idUsuarioAsignado: $idU) {
+                id
+                descripcion
+                idUsuarioAsignado
+            }
+        }
+    `;
+
+    const data = await enviarConsulta(query, { idT: id, idU: idUsuarioAsignado });
+    mostrarResultado(data);
+};
