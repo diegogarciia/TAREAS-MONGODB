@@ -24,6 +24,21 @@ const resolvers = {
         tareas: async (_, { dificultad }) => {
             const filtro = dificultad ? { dificultad } : {};
             return await TareaModel.find(filtro);
+        },
+        obtenerTareas: async (_, __, { redisClient }) => {
+            
+            const cachedTasks = await redisClient.get("tareas_cache");
+            
+            if (cachedTasks) {
+                console.log("Servido desde Redis");
+                return JSON.parse(cachedTasks);
+            }
+            
+            const tareas = await TareaModel.find();
+            console.log("Servido desde MongoDB 🔵");
+            await redisClient.setEx("tareas_cache", 60, JSON.stringify(tareas));
+
+            return tareas;
         }
     },
 
@@ -53,7 +68,7 @@ const resolvers = {
             return resultado.deletedCount > 0;
         },
 
-        agregarTarea: async (_, { idUsuarioAsignado, descripcion, duracion, dificultad, estado }, { io }) => {
+        agregarTarea: async (_, { idUsuarioAsignado, descripcion, duracion, dificultad, estado }, { io, redisClient }) => {
             const ultimaTarea = await TareaModel.findOne().sort('-id');
             const nuevoId = ultimaTarea ? ultimaTarea.id + 1 : 1;
 
@@ -67,6 +82,8 @@ const resolvers = {
             });
 
             const resultado = await nuevaTarea.save();
+
+            await redisClient.del("tareas_cache");
             
             if (io) io.emit('actualizar-dashboard'); 
             
@@ -126,6 +143,7 @@ const resolvers = {
             );
             
             if (tareaActualizada && io) {
+                await redisClient.del("tareas_cache");
                 io.emit('actualizar-dashboard');
             }
             

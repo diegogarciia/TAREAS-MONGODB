@@ -2,59 +2,74 @@ import TareaModel from '../models/Tarea.js';
 import UserModel from '../models/Usuario.js'
 
 const controlador = {
-
-    addTarea: async (req, res) => {
+    
+    addTarea: async (req, res, redisClient) => { 
+        
         try {
             const { idUsuarioAsignado, descripcion, duracion, dificultad, estado } = req.body; 
-
+            
             const ultimaTarea = await TareaModel.findOne().sort('-id');
             const nuevoId = ultimaTarea ? ultimaTarea.id + 1 : 1;
-
+            
             if (!descripcion || descripcion.trim() === "") { 
                 return res.status(400).json({ msg: "La descripción no puede estar vacía" });
             }
-
-            const usuario = await UserModel.findOne({ id: idUsuarioAsignado });
-
-            if (!usuario) {
-                console.log('‼️ Usuario no encontrado!');
+            
+            const usuarioExiste = await UserModel.findOne({ id: idUsuarioAsignado });
+            
+            if (!usuarioExiste) {
                 return res.status(404).json({ msg: "Usuario no encontrado" });
             }
-
+            
             const nuevaTarea = new TareaModel({
                 id: nuevoId,
-                idUsuarioAsignado: idUsuarioAsignado,
-                descripcion: descripcion, 
-                duracion: duracion, 
-                dificultad: dificultad, 
-                estado: estado, 
+                idUsuarioAsignado,
+                descripcion, 
+                duracion, 
+                dificultad, 
+                estado: estado || 'por hacer', 
             });
-
+            
             await nuevaTarea.save();
-
-            console.log("🔵 Tarea añadida correctamente:", nuevaTarea);
+            console.log('🔵 Tarea guardada en MongoDB');
+            
+            if (redisClient) {
+                await redisClient.del("tareas"); 
+                console.log('🧹 Caché de Redis eliminada');
+            }
+            
+            const io = req.app.get('socketio');
+            
+            if (io) io.emit('actualizar-dashboard');
+            
             res.status(201).json({ msg: "Tarea añadida correctamente", tarea: nuevaTarea });
-
-            req.app.get('socketio').emit('actualizar-dashboard');
-
+        
         } catch (error) {
             console.error("❌ Error al añadir tarea:", error);
             res.status(500).json({ msg: "Error al añadir tarea" });
         }
     },
-    tareasGet : async (req, res) => {
+    tareasGet: async (req, res, redisClient) => {
         try {
+            const cachedTasks = await redisClient.get("tareas");
+            
+            if (cachedTasks) {
+                console.log("Cache de tareas usado");
+                return res.status(200).json(JSON.parse(cachedTasks));
+            }
+            
             const tareas = await TareaModel.find();
+            
             if (tareas.length > 0) {
-                console.log(tareas)
-                console.log('🔵Listado correcto!');
+                await redisClient.setEx("tareas", 60, JSON.stringify(tareas));
+                
+                console.log('🔵 Tareas obtenidas de la BD y guardadas en caché');
                 res.status(200).json(tareas);
             } else {
-                console.log('‼️ No hay registros!');
                 res.status(200).json({ 'msg': 'No se han encontrado registros' });
             }
         } catch (error) {
-            console.error('❌ Error al obtener tareas:', error);
+            console.error('❌ Error:', error);
             res.status(500).json({ 'msg': 'Error al obtener tareas' });
         }
     },
@@ -157,7 +172,7 @@ const controlador = {
             res.status(500).json({ 'msg': 'Error al actualizar tarea' });
         }
     },
-    tareaActualizarEstado: async (req, res) => {
+    tareaActualizarEstado: async (req, res, redisClient) => {
         try {
             const { estado } = req.body;
 
@@ -173,6 +188,7 @@ const controlador = {
             );
 
             if (!tareaActualizada) return res.status(403).json({ msg: "No autorizado o tarea no encontrada" });
+            await redisClient.del("tareas"); 
             res.status(200).json(tareaActualizada);
         } catch (error) {
             res.status(500).json({ msg: "Error al actualizar estado" });
@@ -183,6 +199,7 @@ const controlador = {
         try {
             const tareaEliminada = await TareaModel.deleteOne({id:req.params.id});
             if (tareaEliminada.deletedCount > 0) {
+                await redisClient.del("tareas");
                 console.log('🔵 Tarea eliminada correctamente!');
                 res.status(200).json(tareaEliminada);
             } else {

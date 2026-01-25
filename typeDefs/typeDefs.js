@@ -26,6 +26,7 @@ const typeDefs = gql`
     tareas(dificultad: String): [Tarea]
     tarea(id: Int!): Tarea
     tareasPorUsuario(userId: Int!): [Tarea]
+    obtenerTareas: [Tarea]
   }
 
   type Mutation {    

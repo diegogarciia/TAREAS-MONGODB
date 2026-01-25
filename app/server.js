@@ -16,6 +16,7 @@ import { router as googleRoutes} from '../routes/googleRoutes.js';
 import { Server as SocketServer } from 'socket.io';
 import { createServer } from 'http';
 import { socketController } from '../controllers/websocket-controller.js';
+import { createClient } from '@redis/client';
 
 class Server {
     
@@ -27,11 +28,16 @@ class Server {
         
         this.tasksPath = '/tasks'; 
         this.authPath  = '/auth';
-        this.graphQLPath = '/graphql';  
+        this.graphQLPath = '/graphql';
+        
+        this.redisClient = createClient(); 
+        this.redisClient.on('error', (err) => console.log('Redis Client Error', err));
 
         this.middlewares();
         this.conectarMongoose();
         this.routes();
+
+        this.conectarRedis();
 
         this.io = new SocketServer(this.httpServer, {
             cors: { origin: "*" }
@@ -60,6 +66,11 @@ class Server {
         });
     }
 
+    async conectarRedis() {
+        await this.redisClient.connect();
+        console.log(kleur.yellow(`🌎 Conectado a Redis`));
+    }
+
     async start() {
         await this.serverGraphQL.start();
         this.applyGraphQLMiddleware();
@@ -85,7 +96,7 @@ class Server {
 
     routes() {
         this.app.use(this.authPath, userRoutes, authRoutes);
-        this.app.use(this.tasksPath, tareaRoutes);
+        this.app.use(this.tasksPath, tareaRoutes(this.redisClient));
         this.app.use('/api/auth', googleRoutes);
     }
 
@@ -94,7 +105,10 @@ class Server {
             this.graphQLPath,
             express.json(),
             expressMiddleware(this.serverGraphQL, {
-                context: async () => ({ io: this.io }) 
+                context: async () => ({ 
+                    io: this.io,
+                    redisClient: this.redisClient
+                })
             })
         );
     }
