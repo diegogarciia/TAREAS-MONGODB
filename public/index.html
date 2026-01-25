@@ -26,7 +26,7 @@
                 <h3>Asignaciones</h3>
                 <button onclick="obtenerTareasPorPersona()">Tareas por Persona</button>
                 <button onclick="obtenerTareasPersonaFiltradas()">Persona + Dificultad</button>
-                <button onclick="obtenerTareasSinAsignar()">Tareas sin Asignar (Prioridad)</button>
+                <button onclick="obtenerTareasSinAsignar()">Tareas sin Asignar</button>
             </div>
 
             <div class="grupo-control">
@@ -35,6 +35,8 @@
             </div>
         </section>
 
+        <hr>
+
         <section id="seccion-resultados">
             <h2>Resultados de la Consulta</h2>
             <div id="resultado" class="json-viewer">
@@ -42,10 +44,24 @@
             </div>
         </section>
 
+        <hr>
+        
+        <section id="controles-admin" style="display: none;">
+            <h2>Panel de Administración</h2>
+            <div class="grupo-control">
+                <h3>Gestión Global</h3>
+                <button onclick="generarUsuariosFaker()">Generar Usuarios Aleatorios (Faker)</button>
+                <button onclick="mostrarFormularioTarea()">Crear Nueva Tarea</button>
+            </div>
+            <hr>
+        </section>
+
         <section id="seccion-contador-tareas-sin-asignar">
             <span id="contador-tareas-sin-asignar"></span>
         </section>
     </main>
+
+    <hr>
 
     <button id="btnLogout">Cerrar Sesión</button>
 

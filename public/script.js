@@ -1,8 +1,13 @@
 const enviarConsulta = async (query, variables = {}) => {
+    const token = localStorage.getItem('token');
+
     try {
         const response = await fetch('http://localhost:9090/graphql', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': token ? `Bearer ${token}` : ''
+            },
             body: JSON.stringify({ query, variables }),
         });
         const data = await response.json();
@@ -191,7 +196,7 @@ const actualizarContador = async () => {
         
         const spanContador = document.getElementById('contador-tareas-sin-asignar');
         if (spanContador) {
-            spanContador.innerText = `Tareas pendientes: ${sinAsignar.length}`;
+            spanContador.innerText = `Contador de tareas sin asignar: ${sinAsignar.length}`;
         }
     }
 };
@@ -201,3 +206,65 @@ socket.on('actualizar-dashboard', () => {
 });
 
 actualizarContador();
+
+const rol = localStorage.getItem('user_rol');
+
+if (rol === 'ADMINISTRADOR') {
+    const panelAdmin = document.getElementById('controles-admin');
+    if (panelAdmin) {
+        panelAdmin.style.display = 'block';
+    }
+}
+
+const generarUsuariosFaker = async () => {
+    const query = `
+        mutation {
+            generarUsuariosAleatorios(cantidad: 10) {
+                nombre
+                email
+            }
+        }
+    `;
+    const data = await enviarConsulta(query);
+    mostrarResultado(data);
+    socket.emit('notificar-cambio-tareas'); 
+};
+
+socket.on('actualizar-dashboard', () => {
+    console.log("Actualización recibida por Socket.io");
+    actualizarContador();
+    
+    const resultadoDiv = document.getElementById('resultado');
+    if (resultadoDiv.innerText.includes("idUsuarioAsignado: 0")) {
+        obtenerTareasSinAsignar();
+    }
+});
+
+const mostrarFormularioTarea = async () => {
+    const descripcion = prompt("Descripción de la tarea:");
+    if (!descripcion) return; 
+
+    const duracion = parseInt(prompt("Duración estimada (horas):"));
+    const dificultad = prompt("Dificultad (XS, S, M, L, XL):").toUpperCase();
+
+    const query = `
+        mutation AgregarTarea($desc: String!, $dur: Int!, $dif: String!) {
+            agregarTarea(
+                idUsuarioAsignado: 0, 
+                descripcion: $desc, 
+                duracion: $dur, 
+                dificultad: $dif, 
+                estado: "por hacer"
+            ) {
+                descripcion
+                estado
+            }
+        }
+    `;
+
+    const variables = { desc: descripcion, dur: duracion, dif: dificultad };
+    const data = await enviarConsulta(query, variables);
+    
+    mostrarResultado(data);
+
+};

@@ -14,6 +14,7 @@ async function manejarLogin() {
                 usuario {
                     id
                     nombre
+                    rol
                 }
             }
         }
@@ -37,6 +38,8 @@ async function manejarLogin() {
             localStorage.setItem('token', result.data.login.token);
             
             localStorage.setItem('user_name', result.data.login.usuario.nombre);
+            
+            localStorage.setItem('user_rol', result.data.login.usuario.rol); 
 
             window.location.href = 'index.html';
         }

@@ -25,8 +25,8 @@ const TareaSchema = Schema({
     },
     estado: {
         type: String,
-        default: 'Todo',
-        enum: ['Todo', 'In progress', 'Done'] 
+        default: 'por hacer',
+        enum: ['por hacer', 'haciendo', 'hecha'] 
     },
     /*asignadaA: {
         type: Schema.Types.ObjectId,
