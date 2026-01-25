@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Gestor de Tareas</title>
+</head>
+<body>
+
+    <main>
+        <h2>Iniciar Sesión</h2>
+        
+        <div>
+            <label for="email">Correo Electrónico:</label><br>
+            <input type="email" id="email" required><br><br>
+            
+            <label for="password">Contraseña:</label><br>
+            <input type="password" id="password" required><br><br>
+            
+            <button id="btnLogin">Entrar</button>
+        </div>
+        
+        <p id="mensaje-error" style="color: red;"></p>
+    </main>
+
+    <hr>
+
+    <h1>Google Signin</h1>
+    <hr>
+    
+    <div id="g_id_onload"
+    
+        data-client_id="614077285756-l6qj1d2eqnsrhgfvhmaftfdjjvfddcmj.apps.googleusercontent.com"
+        data-callback="handleCredentialResponse"
+        data-auto_prompt="false" 
+        data-auto_select="true"
+        >
+    </div>
+
+    <div class="g_id_signin"
+         data-type="standard"
+         data-size="large"
+         data-theme="filled_blue"
+         data-text="sign_in_with"
+         data-shape="pill"
+         data-logo_alignment="center">
+      </div>
+
+      <button id="g_id_signout">Sign Out</button>
+
+
+      <hr>
+      <h1>Probando el login con Google.</h1>
+      <a href="https://developers.google.com/identity/gsi/web/guides/overview?hl=es-419">Documentación</a>
+     
+    
+    <script>
+    async function handleCredentialResponse (response) {
+
+        console.log('Token recibido de Google', response.credential); 
+
+        const body = { id_token: response.credential }
+        fetch('http://localhost:9090/api/auth/google', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        })
+        .then( r=> r.json() ) 
+        .then( resp =>{
+            console.log(resp )
+            
+            document.getElementById('user_name').innerText = resp.correo;
+            document.getElementById('user_token').innerText = resp.token;
+            localStorage.setItem('email', resp.correo);
+
+            document.querySelector('.g_id_signin').style.display = 'none';
+
+            document.getElementById('user_info').style.display = 'block';
+            document.getElementById('g_id_signout').style.display = 'inline-block';
+        })
+        .catch( console.warn )
+    }
+
+    
+
+    const button = document.getElementById('g_id_signout');
+    button.onclick = async() => {
+
+        console.log(google.accounts.id)
+
+        google.accounts.id.disableAutoSelect(); 
+            const email = localStorage.getItem('email');
+            if (email) {
+                google.accounts.id.revoke(email, done => {
+                    console.log('Consent revoked');
+                    localStorage.clear();
+                    location.reload(); 
+                });
+            } else {
+                console.warn('No email found in localStorage');
+            }
+    }
+
+    window.onload = () => {
+        const email = localStorage.getItem('email');
+        if (email) {
+            document.getElementById('user_name').innerText = email;
+            document.querySelector('.g_id_signin').style.display = 'none';
+            document.getElementById('user_info').style.display = 'block';
+            document.getElementById('g_id_signout').style.display = 'inline-block';
+        } else {
+            google.accounts.id.disableAutoSelect();
+        }
+    };
+
+
+    </script>
+
+    <p id="user_info" style="display: none;">
+        <strong>Usuario logueado:</strong> <span id="user_name"></span><br>
+        <strong>Token recibido de la app:</strong> <span id="user_token"></span>
+    </p>
+
+    <script src="login.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+</body>
+</html>

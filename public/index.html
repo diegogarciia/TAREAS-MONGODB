@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Tareas GraphQL</title>
+    </head>
+<body>
+
+    <header>
+        <h1>Panel de Gestión de Tareas</h1>
+    </header>
+
+    <main>
+        <section id="controles">
+            <h2>Consultas y Filtros</h2>
+            
+            <div class="grupo-control">
+                <h3>Dificultad y Complejidad</h3>
+                <button onclick="obtenerTareasDificultad()">Tareas por Complejidad</button>
+                <button onclick="obtenerTareasRango()">Rango (Menor → Mayor)</button>
+                <button onclick="contarTareasMaximas()">Total Máxima Dificultad (XL)</button>
+            </div>
+
+            <div class="grupo-control">
+                <h3>Asignaciones</h3>
+                <button onclick="obtenerTareasPorPersona()">Tareas por Persona</button>
+                <button onclick="obtenerTareasPersonaFiltradas()">Persona + Dificultad</button>
+                <button onclick="obtenerTareasSinAsignar()">Tareas sin Asignar</button>
+            </div>
+
+            <div class="grupo-control">
+                <h3>Extras</h3>
+                <button onclick="obtenerCargaTrabajo()">Carga de Trabajo por Usuario</button>
+            </div>
+        </section>
+
+        <hr>
+
+        <section id="seccion-resultados">
+            <h2>Resultados de la Consulta</h2>
+            <div id="resultado" class="json-viewer">
+                <p>Esperando consulta...</p>
+            </div>
+        </section>
+
+        <hr>
+        
+        <section id="controles-admin" style="display: none;">
+            <h2>Panel de Administración</h2>
+            <div class="grupo-control">
+                <h3>Gestión Global</h3>
+                <button onclick="generarUsuariosFaker()">Generar Usuarios Aleatorios (Faker)</button>
+                <button onclick="mostrarFormularioTarea()">Crear Nueva Tarea</button>
+                <button onclick="asignarTareaUsuario()">Asignar Tarea a Usuario</button>
+                <button onclick="modificarEstadoTarea()">Modificar el estado de una tarea</button>
+            </div>
+            <hr>
+        </section>
+
+        <section id="controles-usuario" style="display: none;">
+            <h2>Panel de Usuario</h2>
+            <div class="grupo-control">
+                <h3>Gestión Global</h3>
+                <button onclick="modificarEstadoTarea()">Modificar el estado de una tarea</button>
+            </div>
+            <hr>
+        </section>
+
+        <section id="seccion-contador-tareas-sin-asignar">
+            <span id="contador-tareas-sin-asignar"></span>
+        </section>
+    </main>
+
+    <hr>
+
+    <button id="btnLogout">Cerrar Sesión</button>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="./script.js"></script>
+
+    </body>
+</html>

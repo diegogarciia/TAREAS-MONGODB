@@ -1,0 +1,40 @@
+import { Schema, model } from 'mongoose';
+
+const TareaSchema = Schema({
+    id: { 
+        type: Number, 
+        unique: true, 
+        required: true 
+    },
+    idUsuarioAsignado: {
+        type: Number, 
+        required: true
+    },
+    descripcion: {
+        type: String,
+        required: [true, 'La descripción es obligatoria']
+    },
+    duracion: {
+        type: Number, 
+        required: true
+    },
+    dificultad: {
+        type: String,
+        required: true,
+        enum: ['XS', 'S', 'M', 'L', 'XL'] 
+    },
+    estado: {
+        type: String,
+        default: 'por hacer',
+        enum: ['por hacer', 'haciendo', 'hecha'] 
+    },
+    /*asignadaA: {
+        type: Schema.Types.ObjectId,
+        ref: 'Usuario' 
+    }
+    */
+}, {
+    collection: 'tareas' , versionKey: false, strict: false
+});
+
+export default model('Tarea', TareaSchema);
