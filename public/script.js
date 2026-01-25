@@ -216,6 +216,13 @@ if (rol === 'ADMINISTRADOR') {
     }
 }
 
+if (rol === 'ESTANDAR') {
+    const panelUsuario = document.getElementById('controles-usuario');
+    if (panelUsuario) {
+        panelUsuario.style.display = 'block';
+    }
+}
+
 const generarUsuariosFaker = async () => {
     const query = `
         mutation {
@@ -286,5 +293,30 @@ const asignarTareaUsuario = async () => {
     `;
 
     const data = await enviarConsulta(query, { idT: id, idU: idUsuarioAsignado });
+    mostrarResultado(data);
+};
+
+const modificarEstadoTarea = async () => {
+    const id = parseInt(prompt("Introduce el ID de la tarea que quieres actualizar:"));
+    const nuevoEstado = prompt("Introduce el nuevo estado (por hacer, haciendo, hecha):");
+
+    if (isNaN(id) || !nuevoEstado) return alert("Datos no válidos");
+
+    const query = `
+        mutation ActualizarEstado($idTarea: Int!, $estadoTarea: String!) {
+            tareaActualizarEstado(id: $idTarea, estado: $estadoTarea) {
+                id
+                descripcion
+                estado
+            }
+        }
+    `;
+
+    const variables = { 
+        idTarea: id, 
+        estadoTarea: nuevoEstado.toLowerCase() 
+    };
+
+    const data = await enviarConsulta(query, variables);
     mostrarResultado(data);
 };

@@ -78,12 +78,26 @@ const resolvers = {
             return resultado.deletedCount > 0;
         },
 
-        tareaActualizarEstado: async (_, { id, estado }) => {
-            return await TareaModel.findOneAndUpdate(
+        tareaActualizarEstado: async (_, { id, estado }, { io }) => {
+            const tareaActual = await TareaModel.findOne({ id });
+            if (!tareaActual) throw new Error("Tarea no encontrada");
+            
+            const nuevoEstado = estado.toLowerCase();
+            const estadosPermitidos = ['por hacer', 'haciendo', 'hecha'];
+            
+            if (!estadosPermitidos.includes(nuevoEstado)) {
+                throw new Error("Estado no válido. Usa: 'por hacer', 'haciendo' o 'hecha'.");
+            }
+            
+            const tareaActualizada = await TareaModel.findOneAndUpdate(
                 { id },
-                { estado },
+                { estado: nuevoEstado },
                 { new: true }
             );
+            
+            if (tareaActualizada && io) io.emit('actualizar-dashboard');
+
+            return tareaActualizada;
         },
         
         login: async (_, { email, password }) => {
