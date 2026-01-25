@@ -8,7 +8,6 @@ const TareaSchema = Schema({
     },
     idUsuarioAsignado: {
         type: Number, 
-        unique: true, 
         required: true
     },
     descripcion: {

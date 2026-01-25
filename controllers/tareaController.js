@@ -35,6 +35,8 @@ const controlador = {
             console.log("🔵 Tarea añadida correctamente:", nuevaTarea);
             res.status(201).json({ msg: "Tarea añadida correctamente", tarea: nuevaTarea });
 
+            req.app.get('socketio').emit('actualizar-dashboard');
+
         } catch (error) {
             console.error("❌ Error al añadir tarea:", error);
             res.status(500).json({ msg: "Error al añadir tarea" });

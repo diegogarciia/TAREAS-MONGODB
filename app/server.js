@@ -13,11 +13,17 @@ import typeDefs from '../typeDefs/typeDefs.js';
 import resolvers from '../resolvers/resolvers.js';
 import { ApolloServer } from '@apollo/server';
 import { router as googleRoutes} from '../routes/googleRoutes.js';
+import { Server as SocketServer } from 'socket.io';
+import { createServer } from 'http';
+import { socketController } from '../controllers/websocket-controller.js';
 
 class Server {
     
     constructor() {
         this.app = express();
+        this.port = process.env.PORT || 9090;
+
+        this.httpServer = createServer(this.app);
         
         this.tasksPath = '/tasks'; 
         this.authPath  = '/auth';
@@ -26,6 +32,12 @@ class Server {
         this.middlewares();
         this.conectarMongoose();
         this.routes();
+
+        this.io = new SocketServer(this.httpServer, {
+            cors: { origin: "*" }
+        });
+
+        this.sockets();
 
         this.serverGraphQL = new ApolloServer({
             typeDefs,
@@ -78,17 +90,26 @@ class Server {
     }
 
     applyGraphQLMiddleware() {
-        this.app.use(this.graphQLPath , express.json(), expressMiddleware(this.serverGraphQL));
+        this.app.use(
+            this.graphQLPath,
+            express.json(),
+            expressMiddleware(this.serverGraphQL, {
+                context: async () => ({ io: this.io }) 
+            })
+        );
     }
 
     listen() {
-        this.app.listen(process.env.PORT, () => {
-            console.log(kleur.green(`🟢 Servidor GraphQL escuchando en: ${process.env.URL}:${process.env.PORT}${this.graphQLPath}`));
-            console.log(kleur.blue(`🔵 Servidor API Rest escuchando en: ${process.env.URL}:${process.env.PORT}${this.usuariosPath}`));
-            console.log(kleur.yellow(`🌎 Página de prueba escuchando en: ${process.env.URL}:${process.env.PORT}`));
-        })
-        this.applyGraphQLMiddleware()
+        this.httpServer.listen(this.port, () => {
+            console.log(kleur.green(`🟢 Servidor (API + Sockets) corriendo en el puerto: ${this.port}`));
+            console.log(kleur.blue(`🔵 GraphQL en: ${process.env.URL}:${this.port}${this.graphQLPath}`));
+        });
     }
+
+    sockets() {
+        this.io.on("connection", (socket) => socketController(socket, this.io)); 
+    }
+
 }
 
 export { Server };

@@ -173,3 +173,31 @@ document.getElementById('btnLogout').addEventListener('click', () => {
 
     window.location.href = 'login.html';
 });
+
+const socket = io(); 
+
+const actualizarContador = async () => {
+    const query = `
+        query {
+            tareas {
+                idUsuarioAsignado
+            }
+        }
+    `;
+    const data = await enviarConsulta(query);
+    
+    if (data.data && data.data.tareas) {
+        const sinAsignar = data.data.tareas.filter(t => !t.idUsuarioAsignado || t.idUsuarioAsignado === 0);
+        
+        const spanContador = document.getElementById('contador-tareas-sin-asignar');
+        if (spanContador) {
+            spanContador.innerText = `Tareas pendientes: ${sinAsignar.length}`;
+        }
+    }
+};
+
+socket.on('actualizar-dashboard', () => {
+    actualizarContador();
+});
+
+actualizarContador();

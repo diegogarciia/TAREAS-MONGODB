@@ -53,20 +53,24 @@ const resolvers = {
             return resultado.deletedCount > 0;
         },
 
-        agregarTarea: async (_, { idUsuarioAsignado, descripcion, duracion, dificultad, estado }) => {
+        agregarTarea: async (_, { idUsuarioAsignado, descripcion, duracion, dificultad, estado }, { io }) => {
             const ultimaTarea = await TareaModel.findOne().sort('-id');
             const nuevoId = ultimaTarea ? ultimaTarea.id + 1 : 1;
 
             const nuevaTarea = new TareaModel({
                 id: nuevoId,
-                idUsuarioAsignado,
+                idUsuarioAsignado: idUsuarioAsignado || 0,
                 descripcion,
                 duracion,
                 dificultad,
                 estado: estado || 'Todo'
             });
 
-            return await nuevaTarea.save();
+            const resultado = await nuevaTarea.save();
+            
+            if (io) io.emit('actualizar-dashboard'); 
+            
+            return resultado;
         },
 
         tareasDelete: async (_, { id }) => {
