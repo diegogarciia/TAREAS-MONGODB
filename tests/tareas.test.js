@@ -4,7 +4,7 @@ import app from '../app/app.js';
 
 let tareaId; 
 
-describe('Ciclo de vida de una Tarea (GraphQL) 📋', () => {
+describe('Ciclo de vida de una Tarea (GraphQL)', () => {
 
   it('Debería crear una tarea nueva', async () => {
     const mutation = {
