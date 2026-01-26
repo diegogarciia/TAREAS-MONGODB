@@ -66,23 +66,25 @@
             },
             body: JSON.stringify(body)
         })
-        .then( r=> r.json() ) 
-        .then( resp =>{
-            console.log(resp )
+        .then(res => res.json())
+        .then(data => {
             
-            document.getElementById('user_name').innerText = resp.correo;
-            document.getElementById('user_token').innerText = resp.token;
-            localStorage.setItem('email', resp.correo);
-
-            document.querySelector('.g_id_signin').style.display = 'none';
-
-            document.getElementById('user_info').style.display = 'block';
-            document.getElementById('g_id_signout').style.display = 'inline-block';
+            if (data.token && data.usuario) {
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('email', data.usuario.email);
+                localStorage.setItem('user_name', data.usuario.nombre);
+                document.getElementById('user_token').innerText = data.token;
+                
+                window.location.href = 'index.html';
+            } else {
+                const errorMsg = document.getElementById('mensaje-error');
+                if (errorMsg) {
+                    errorMsg.innerText = data.msg || 'Error al validar con Google';
+                }
+                console.error('Fallo en autenticación:', data.msg);
+            }
         })
-        .catch( console.warn )
     }
-
-    
 
     const button = document.getElementById('g_id_signout');
     button.onclick = async() => {
